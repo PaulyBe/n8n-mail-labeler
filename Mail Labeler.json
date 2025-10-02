@@ -1,0 +1,253 @@
+{
+  "name": "G-Mail Labeler",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -32,
+        16
+      ],
+      "id": "1a4b5683-35b0-453a-8be4-e4a593c80915",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "",
+          "name": ""
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputText": "=Sender: {{ $json.From }}\nSubject line:  {{ $json.Subject }}\nContent: {{ $json.snippet }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "Advertisement",
+              "description": "Analyze the content, subject line, and sender of this email. Apply the label 'Advertisement' if the email contains strong indicators of a commercial promotion, such as:  \n\nExplicit mention of sales, discounts, or special offers (e.g., '50% off', 'Limited Time Sale', 'Coupon Inside').  \nProminent call-to-action buttons like 'Shop Now', 'Buy Today', or 'Enroll Now'.  \nThe email is from a known retailer or e-commerce company and is primarily focused on product promotion.  \n\nExclude transactional emails (receipts, order confirmations), general company newsletters without a specific promotion, and unenrollment notifications."
+            },
+            {
+              "category": "Jobs",
+              "description": "Analyze the sender, subject line, and content of this email. \n\nIndicators: The email is sent from my email address and contains keywords like 'job application,' 'resume,' 'CV,' 'cover letter,' 'submitted my application,' 'follow-up,' or is a direct reply to a job posting or recruiter.\n\nIndicators: The email is sent to my email address and is from a company's HR department, a recruiter, or a hiring manager, and contains professional keywords such as 'interview invitation,' 'schedule a call,' 'job offer,' 'compensation,' 'salary,' 'next steps,' 'welcome to the team,' or 'your application status.'\n\nExclude generic networking messages, LinkedIn connection requests without a specific job mention, and general company updates or newsletters from companies I am not actively interviewing with."
+            },
+            {
+              "category": "Work",
+              "description": "Analyze this email's subject line, sender and content. Check if the communication is from an individual (a private person, not a large corporation's official HR or Sales department) and relates to my ongoing or potential freelance tasks.\n\nLook for keywords indicating client work, project management, and task-related discussion, such as:\n\nAction Items & Deliverables: 'Draft review,' 'final delivery,' 'attached files,' 'milestone,' 'feedback,' 'deadline,' 'next steps,' or 'approvals.'\n\nDirect Task Requests: Phrases like 'Can you please,' 'I need you to look at,' or 'Update me on the status.'\n\nDo not apply this label to: personal or social emails from friends or family, general advertisements, or emails from automated systems (like email marketing platforms or generic notifications)."
+            },
+            {
+              "category": "Unknown",
+              "description": "Any other e-mail that doesn't fall into the other categories"
+            },
+            {
+              "category": "Receipt",
+              "description": "Analyze the content, sender and subject line of this email. Check if the email is a formal transactional notification confirming a financial transaction, order, or subscription payment.\n\nLook for explicit commercial and financial keywords and structural elements, such as:\n\nSubject Line Indicators: 'Your Receipt,' 'Order Confirmation,' 'Invoice Attached,' 'Payment Successful,' 'Subscription Renewal,' 'Thank You For Your Order,' or 'Your Statement.'\n\nContent Indicators: 'Total Charged,' 'Amount Due,' 'Transaction ID,' 'Order Number,' 'Billing Address,' 'Credit Card ending in,' 'Subscription Term,' or a clearly formatted itemized list of purchased goods or services.\n\nSender Type: The email is from a financial institution, an e-commerce platform, or a service provider immediately following a purchase.\n\nDo not apply this label to: sales promotions that lead to a purchase (which should be 'Advertisement'), refund/cancellation notifications without an attached receipt, or simple shipping notifications (unless the full original receipt is included)."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        -32
+      ],
+      "id": "875f8ebb-fdd0-439e-9538-8212901d244e",
+      "name": "Text Classifier"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        208,
+        256
+      ],
+      "id": "ec270079-4760-4b04-86b5-404b136c28cf",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "",
+          "name": ""
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}",
+        "labelIds": [
+          "Label_6888743370235180062"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        640,
+        -352
+      ],
+      "id": "a09672cc-13fa-4d4a-893c-f5b0a04356f4",
+      "name": "Add label to message",
+      "webhookId": "",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "",
+          "name": ""
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}",
+        "labelIds": [
+          "Label_6709381150246422854"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        640,
+        -176
+      ],
+      "id": "166ac2cd-7514-49af-b471-a615a2b4511e",
+      "name": "Add label to message1",
+      "webhookId": "",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "",
+          "name": ""
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}",
+        "labelIds": [
+          "Label_7160995700945526871"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        640,
+        16
+      ],
+      "id": "08984c8f-9be1-450b-a662-7e1902ab7732",
+      "name": "Add label to message2",
+      "webhookId": "",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "",
+          "name": ""
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $('Gmail Trigger').item.json.id }}",
+        "labelIds": [
+          "Label_1347804151771468559"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        640,
+        240
+      ],
+      "id": "fc6bfdae-35b6-4372-9f72-198c7a691951",
+      "name": "Add label to message3",
+      "webhookId": "",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "",
+          "name": ""
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Classifier": {
+      "main": [
+        [
+          {
+            "node": "Add label to message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add label to message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Add label to message2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [
+          {
+            "node": "Add label to message3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": ""
+  },
+  "id": "",
+  "tags": []
+}
